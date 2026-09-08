@@ -4,7 +4,7 @@ import NavHeader from "../global/NavHeader";
 function AppLayout() {
 
   return (
-    <div className="flex flex-row min-h-screen bg-slate-900">
+    <div className="flex min-h-screen bg-slate-900">
       <NavHeader />
       <main className="flex-1 p-8 text-gray-200">
         <Outlet />
