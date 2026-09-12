@@ -4,7 +4,7 @@ import type { ReactElement } from 'react';
 type PropTypes = {
   type?: "button" | "submit" | "reset";
   text?: string;
-  color?: "gray" | "blue" | "red" | "green";
+  color?: "gray" | "blue" | "red" | "green" | "black";
   size?: "lg" | "md" | "sm";
   className? : string ,
   icon?: ReactElement;
@@ -36,13 +36,20 @@ const DsButton = ({
   let sizeClass = '';
 
   switch (color) {
-    case 'green': colorClass = 'bg-green-500 text-white hover:bg-green-700'
+    case "green":
+      colorClass = "bg-green-500 text-white hover:bg-green-700";
       break;
-    case 'red': colorClass = 'bg-red-500 text-white hover:bg-red-700'
+    case "red":
+      colorClass = "bg-red-500 text-white hover:bg-red-700";
       break;
-    case 'blue': colorClass = 'bg-blue-500 text-white hover:bg-blue-700'
+    case "blue":
+      colorClass = "bg-blue-500 text-white hover:bg-blue-700";
       break;
-    case 'gray': colorClass = 'bg-gray-500 text-white hover:bg-gray-700'
+    case "gray":
+      colorClass = "bg-gray-500 text-white hover:bg-gray-700";
+      break;
+    case "black":
+      colorClass = "bg-black-500 text-white hover:bg-black-700";
       break;
   }
 

@@ -28,6 +28,7 @@ function Login() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formData),
+      
     });
     const data = await res.json();
     if (res.ok) {
@@ -51,9 +52,9 @@ function Login() {
         console.log(data.message);
         toast.error("failed");
       }
-    } catch (err) {
-      console.log(err);
-      toast.error(err as string);
+    } catch (error) {
+      const err = error as { message: string };
+      toast.error(err.message);
       console.log("catch");
     } finally {
       setisLoading(false);
@@ -144,8 +145,7 @@ function Login() {
             Don't have an account?{" "}
             <button
               type="button"
-              className="font-medium text-blue-400 transition hover:text-blue-300 cursor-pointer"
-              disabled
+              className="font-medium text-blue-400 transition hover:text-blue-300 "
             >
               Sign up
             </button>
