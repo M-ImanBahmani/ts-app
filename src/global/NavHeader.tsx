@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import DsButton from "../design-system/DsButton";
 import { useEffect, useState } from "react";
 import {
@@ -15,12 +15,17 @@ import {
   PlusSquare,
   Package,
   ShoppingCart,
+  X,
 } from "lucide-react";
 import { DUMMY_BASE_URL } from "../Contstans";
 import { useAuthStore } from "../Stores/Auth.store";
 import { useCartStore } from "../Stores/Cart.store";
+import SidebarNavItem from "./SidebarNavItem";
+import SidebarTooltip from "./SidebarTooltip";
+import { useMutation } from "@tanstack/react-query";
+import { fetchMeApi } from "../Services/login-services";
+import { toast } from "react-toastify";
 
-// اضافه شدن آیکون به لینک‌ها برای زیبایی در حالت سایدبار بسته
 const links = [
   { title: "Home", link: "/app/home", icon: <Home size={22} /> },
   { title: "Posts", link: "/app/posts", icon: <FileText size={22} /> },
@@ -31,44 +36,38 @@ const links = [
   { title: "Products", link: "/app/products", icon: <Package size={22} /> },
 ];
 
-function NavHeader() {
+type Props = {
+  isMobileOpen: boolean;
+  setIsMobileOpen: (isOpen: boolean) => void;
+};
+
+function NavHeader({ isMobileOpen, setIsMobileOpen }: Props) {
   const navigate = useNavigate();
   const { user, setUser } = useAuthStore();
   const { cartItems, clearCart } = useCartStore();
 
-  // استیت برای کنترل باز و بسته بودن منو
   const [isOpen, setIsOpen] = useState(true);
+  const isExpanded = isOpen || isMobileOpen;
 
-  const loginApi = async () => {
-    const res = await fetch(`${DUMMY_BASE_URL}/auth/me`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${sessionStorage.getItem("token")}`,
-      },
-    });
-    const data = await res.json();
-    if (res.ok) return data;
-    return Promise.reject(data.message);
-  };
+  const { mutate } = useMutation({
+    mutationFn: fetchMeApi,
+    onSuccess: (data) => {
+      setUser(data);
+    },
+    onError: (error: Error) => {
+      handleLogout();
+      toast.error(error.message || "Session Expired");
+    },
+  });
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const data = await loginApi();
-        setUser(data);
-      } catch (error) {
-        console.log("Token validation failed:", error);
-        handleLogout();
-      }
-    };
-
-    if (!sessionStorage.getItem("token")) {
-      sessionStorage.removeItem("token");
+    const token = sessionStorage.getItem("token");
+    if (!token) {
       navigate("/login");
-    } else {
-      fetchUserData();
+    } else if (!user) {
+      mutate(token);
     }
-  }, []);
+  }, [navigate, mutate, user]);
 
   const handleLogout = () => {
     clearCart();
@@ -78,112 +77,135 @@ function NavHeader() {
 
   const gotoProfile = () => {
     navigate("/app/profile");
+    setIsMobileOpen(false);
   };
 
   if (!user) {
     return (
-      <aside className="flex h-screen w-20 sm:w-64 flex-col items-center justify-center border-r border-slate-800 bg-slate-900 sticky top-0">
+      <aside className="hidden h-screen w-20 flex-col items-center justify-center border-r border-slate-800 bg-slate-900 md:flex sm:w-64 shrink-0">
         <LoaderCircle className="h-8 w-8 animate-spin text-blue-500" />
       </aside>
     );
   }
 
   return (
-    <aside
-      className={`sticky top-0 flex h-screen flex-col border-r border-slate-800 bg-slate-900 transition-all duration-300 ease-in-out ${
-        isOpen ? "w-64" : "w-20"
-      }`}
-    >
-      {/* دکمه باز و بسته کردن منو */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="absolute -right-3 top-6 flex h-7 w-7 items-center justify-center rounded-full border border-slate-700 bg-slate-800 text-slate-300 transition-colors hover:bg-blue-600 hover:text-white focus:outline-none z-50"
-      >
-        {isOpen ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
-      </button>
-
-      {/* هدر سایدبار */}
-      <div className="flex flex-col items-center justify-center pt-8 pb-4">
-        <h2
-          className={`font-bold text-white transition-all duration-300 overflow-hidden whitespace-nowrap ${isOpen ? "text-xl opacity-100" : "text-[0px] opacity-0"}`}
-        >
-          My Dashboard
-        </h2>
-        {cartItems.length > 0 && (
-          <div
-            className={`mt-6 relative flex justify-center ${isOpen ? "mx-4" : "mx-auto"}`}
-          >
-            <DsButton
-              text={isOpen ? "Cart" : ""}
-              icon={<ShoppingCart size={isOpen ? 18 : 20} />}
-              color="blue"
-              className={`w-full ${isOpen ? "justify-center py-2.5" : "justify-center h-10 w-10 p-0"} rounded-xl shadow-lg shadow-blue-900/20`}
-              onClick={() => navigate("/app/cart")}
-            />
-
-            {/* نشانگر عدد ثابت در گوشه بالا-راست */}
-            <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full border-2 border-slate-900 bg-red-500 text-[11px] font-bold text-white shadow-sm pointer-events-none">
-              {cartItems.length}
-            </span>
-          </div>
-        )}
-      </div>
-
-      {/* لینک‌های منو */}
-      <nav className="flex-1 overflow-y-auto overflow-x-hidden px-3 py-4">
-        <ul className="flex flex-col gap-2">
-          {links.map((item, index) => (
-            <li key={index}>
-              <NavLink
-                to={item.link}
-                className={({ isActive }) =>
-                  `flex items-center rounded-xl transition-all duration-300 ${
-                    isOpen ? "justify-start px-4 py-3" : "justify-center p-3"
-                  } ${
-                    isActive
-                      ? "bg-blue-600 text-white shadow-lg shadow-blue-900/20"
-                      : "text-slate-400 hover:bg-slate-800 hover:text-white"
-                  }`
-                }
-              >
-                <span className="shrink-0">{item.icon}</span>
-                <span
-                  className={`font-medium transition-all duration-300 overflow-hidden whitespace-nowrap ${
-                    isOpen ? "ml-4 w-auto opacity-100" : "ml-0 w-0 opacity-0"
-                  }`}
-                >
-                  {item.title}
-                </span>
-              </NavLink>
-            </li>
-          ))}
-        </ul>
-      </nav>
-
-      {/* پروفایل و خروج */}
-      <div className="border-t border-slate-800 p-4">
+    <>
+      {isMobileOpen && (
         <div
-          onClick={gotoProfile}
-          className={`mb-4 flex cursor-pointer items-center justify-center rounded-xl bg-slate-800 p-2 text-slate-300 transition-colors hover:bg-slate-700 hover:text-white ${isOpen ? "gap-3" : "gap-0"}`}
+          onClick={() => setIsMobileOpen(false)}
+          className="fixed inset-0 z-40 bg-slate-950/80 backdrop-blur-sm md:hidden"
+        ></div>
+      )}
+
+      <aside
+        className={`fixed inset-y-0 left-0 z-60 flex h-screen shrink-0 flex-col border-r border-slate-800 bg-slate-900 transition-all duration-300 ease-in-out md:relative md:translate-x-0 ${
+          isMobileOpen ? "translate-x-0 w-64" : "-translate-x-full"
+        } ${isOpen ? "md:w-64" : "md:w-20"}`}
+      >
+        <button
+          onClick={() => setIsMobileOpen(false)}
+          className="absolute right-4 top-4 text-slate-400 hover:text-white md:hidden"
         >
-          <LucideUser2 size={24} className="shrink-0 text-blue-400" />
-          <div
-            className={`flex flex-col overflow-hidden whitespace-nowrap transition-all duration-300 ${isOpen ? "w-auto opacity-100" : "w-0 opacity-0"}`}
+          <X size={20} />
+        </button>
+
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="absolute -right-3 top-6 z-50 hidden h-7 w-7 items-center justify-center rounded-full border border-slate-700 bg-slate-800 text-slate-300 transition-colors hover:bg-blue-600 hover:text-white md:flex"
+        >
+          {isOpen ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
+        </button>
+
+        <div className="flex flex-col items-center justify-center pb-4 pt-8 shrink-0">
+          <h2
+            className={`overflow-hidden whitespace-nowrap font-bold text-white transition-all duration-300 ${
+              isExpanded
+                ? "w-auto text-xl opacity-100"
+                : "h-0 w-0 text-[0px] opacity-0"
+            }`}
           >
-            <span className="text-sm font-semibold">{user.firstName}</span>
-            <span className="text-xs text-slate-500">{user.lastName}</span>
-          </div>
+            My Dashboard
+          </h2>
+
+          {cartItems.length > 0 && (
+            <SidebarTooltip text="Cart" isExpanded={isExpanded}>
+              <div
+                className={`relative mx-auto mt-6 flex justify-center transition-all duration-300 ${
+                  isExpanded ? "w-4/5" : "w-10"
+                }`}
+              >
+                <DsButton
+                  text={isExpanded ? "Cart" : ""}
+                  icon={<ShoppingCart size={isExpanded ? 18 : 20} />}
+                  color="blue"
+                  justIcon={!isExpanded}
+                  className={`flex items-center justify-center rounded-xl shadow-lg shadow-blue-900/20 transition-all duration-300 ${
+                    isExpanded ? "w-full py-2.5" : "h-10 w-10 p-0"
+                  }`}
+                  onClick={() => {
+                    navigate("/app/cart");
+                    setIsMobileOpen(false);
+                  }}
+                />
+                <span className="pointer-events-none absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full border-2 border-slate-900 bg-red-500 text-[11px] font-bold text-white shadow-sm">
+                  {cartItems.length}
+                </span>
+              </div>
+            </SidebarTooltip>
+          )}
         </div>
 
-        <DsButton
-          text={isOpen ? "Logout" : ""}
-          icon={<LogOutIcon size={20} />}
-          color="red"
-          className={`w-full justify-center rounded-xl transition-all ${isOpen ? "py-2" : "h-10 w-10 p-0"}`}
-          onClick={handleLogout}
-        />
-      </div>
-    </aside>
+        {/* با برگرداندن کلاس overflow-y-auto، قابلیت اسکرول فقط در لیست منو اعمال می‌شود */}
+        <nav className="flex-1 overflow-y-auto overflow-x-hidden px-3 py-4">
+          <ul className="flex flex-col gap-2">
+            {links.map((item, index) => (
+              <SidebarNavItem
+                key={index}
+                item={item}
+                isExpanded={isExpanded}
+                onClick={() => setIsMobileOpen(false)}
+              />
+            ))}
+          </ul>
+        </nav>
+
+        <div className="border-t border-slate-800 p-4 shrink-0">
+          <SidebarTooltip text="Profile" isExpanded={isExpanded}>
+            <div
+              onClick={gotoProfile}
+              className={`mb-4 flex cursor-pointer items-center rounded-xl bg-slate-800 p-2 text-slate-300 transition-colors hover:bg-slate-700 hover:text-white ${
+                isExpanded ? "justify-start gap-3 px-3" : "justify-center gap-0"
+              }`}
+            >
+              <LucideUser2 size={24} className="shrink-0 text-blue-400" />
+              <div
+                className={`flex flex-col overflow-hidden whitespace-nowrap transition-all duration-300 ${
+                  isExpanded ? "w-auto opacity-100" : "w-0 opacity-0"
+                }`}
+              >
+                <span className="text-sm font-semibold">{user.firstName}</span>
+                <span className="text-xs text-slate-500">{user.lastName}</span>
+              </div>
+            </div>
+          </SidebarTooltip>
+
+          <SidebarTooltip text="Logout" isExpanded={isExpanded}>
+            <DsButton
+              text={isExpanded ? "Logout" : ""}
+              icon={<LogOutIcon size={20} />}
+              color="red"
+              justIcon={!isExpanded}
+              className={`mx-auto flex items-center justify-center transition-all duration-300 ${
+                isExpanded
+                  ? "w-full rounded-xl py-2"
+                  : "h-10 w-10 p-0 rounded-xl"
+              }`}
+              onClick={handleLogout}
+            />
+          </SidebarTooltip>
+        </div>
+      </aside>
+    </>
   );
 }
 

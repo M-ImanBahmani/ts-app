@@ -1,42 +1,44 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Loader2, Send } from "lucide-react";
-import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import PageHeader from "../../../global/PageHeader";
-import SharedBackButton from "../../../global/SharedBackButton";
+import { Loader2, Send, AlertCircle } from "lucide-react";
 import { createPostsApi } from "../../../Services/Post-services";
 import { useAuthStore } from "../../../Stores/Auth.store";
 import type { CreatePostForm } from "../../../Types/CreatePostForm";
+import SharedBackButton from "../../../global/SharedBackButton";
+import PageHeader from "../../../global/PageHeader";
 
 function CreatePost() {
   const { user } = useAuthStore();
-
-  const initialFormData = {
-    title: "",
-    body: "",
-    userId: user?.id || 1,
-  };
-
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [formData, setFormData] = useState<CreatePostForm>(initialFormData);
+
+  const {
+    handleSubmit,
+    register,
+    formState: { errors },
+  } = useForm<CreatePostForm>({
+    defaultValues: {
+      title: "",
+      body: "",
+      userId: user?.id || 1,
+    },
+  });
 
   const { mutate, isPending } = useMutation({
     mutationFn: createPostsApi,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["posts-list"] });
-      toast.success("Post has been created sduccessfuly.");
+      toast.success("Post has been created successfully.");
       navigate("/app/posts");
     },
-    onError: (error) => {
-      toast.error(error.message);
+    onError: (error: Error) => {
+      toast.error(error.message || "Failed to create post.");
     },
   });
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
+  const onCreatePost = (formData: CreatePostForm) => {
     if (!formData.title.trim() || !formData.body.trim()) {
       toast.error("Please fill in all fields.");
       return;
@@ -47,6 +49,7 @@ function CreatePost() {
       userId: formData.userId,
     });
   };
+
   return (
     <div className="min-h-screen bg-gray-50 px-4 py-8 transition-colors duration-300 dark:bg-slate-900 sm:px-6 lg:px-8">
       <SharedBackButton to="/app/posts" text="Back to Posts" />
@@ -60,51 +63,61 @@ function CreatePost() {
         </div>
 
         <div className="p-8 sm:p-12">
-          {/* فرم خود را به جای این div قرار دهید و رویداد onSubmit را هندل کنید */}
-          <form className="space-y-6" onSubmit={(e) => onSubmit(e)}>
-            {/* فیلد عنوان */}
+          <form className="space-y-6" onSubmit={handleSubmit(onCreatePost)}>
             <div className="space-y-2">
               <label
                 htmlFor="title"
-                className="text-sm font-bold text-slate-700 dark:text-slate-300"
+                className="flex items-center justify-between text-sm font-bold text-slate-700 dark:text-slate-300"
               >
-                Post Title
+                <span>Post Title</span>
+                {errors.title && (
+                  <span className="flex animate-pulse items-center gap-1 rounded-md bg-red-100 px-2 py-1 text-[11px] font-extrabold uppercase tracking-wide text-red-600 dark:bg-red-500/20 dark:text-red-400">
+                    <AlertCircle size={14} /> {errors.title.message}
+                  </span>
+                )}
               </label>
               <input
-                type="text"
-                value={formData.title}
-                onChange={(e) =>
-                  setFormData({ ...formData, title: e.target.value })
-                }
                 id="title"
+                type="text"
                 placeholder="E.g., The Future of React 19..."
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 transition-all focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50 dark:text-white dark:focus:border-blue-500 dark:focus:bg-slate-900 dark:focus:ring-blue-500/20"
+                className={`w-full rounded-xl border bg-slate-50 px-4 py-3 text-slate-900 transition-all focus:bg-white focus:outline-none focus:ring-4 dark:bg-slate-900/50 dark:text-white dark:focus:bg-slate-900 ${
+                  errors.title
+                    ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/10"
+                    : "border-slate-200 focus:border-blue-500 focus:ring-blue-500/10 dark:border-slate-700 dark:focus:border-blue-500"
+                }`}
+                {...register("title", { required: "Title is required" })}
               />
             </div>
 
-            {/* فیلد متن پست */}
             <div className="space-y-2">
               <label
                 htmlFor="body"
-                className="text-sm font-bold text-slate-700 dark:text-slate-300"
+                className="flex items-center justify-between text-sm font-bold text-slate-700 dark:text-slate-300"
               >
-                Content
+                <span>Content</span>
+                {errors.body && (
+                  <span className="flex animate-pulse items-center gap-1 rounded-md bg-red-100 px-2 py-1 text-[11px] font-extrabold uppercase tracking-wide text-red-600 dark:bg-red-500/20 dark:text-red-400">
+                    <AlertCircle size={14} /> {errors.body.message}
+                  </span>
+                )}
               </label>
               <textarea
                 id="body"
                 rows={8}
                 placeholder="What's on your mind?..."
-                value={formData.body}
-                onChange={(e) =>
-                  setFormData({ ...formData, body: e.target.value })
-                }
-                className="w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 transition-all focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50 dark:text-white dark:focus:border-blue-500 dark:focus:bg-slate-900 dark:focus:ring-blue-500/20"
+                className={`w-full resize-none rounded-xl border bg-slate-50 px-4 py-3 text-slate-900 transition-all focus:bg-white focus:outline-none focus:ring-4 dark:bg-slate-900/50 dark:text-white dark:focus:bg-slate-900 ${
+                  errors.body
+                    ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/10"
+                    : "border-slate-200 focus:border-blue-500 focus:ring-blue-500/10 dark:border-slate-700 dark:focus:border-blue-500"
+                }`}
+                {...register("body", {
+                  required: "Post body is required",
+                  minLength: { value: 10, message: "Min 10 characters" },
+                })}
               ></textarea>
             </div>
 
-            {/* بخش دکمه ثبت */}
             <div className="flex justify-end pt-4">
-              {/* تغییرات دکمه برای هندل کردن وضعیت لودینگ */}
               <button
                 type="submit"
                 disabled={isPending}
@@ -112,13 +125,11 @@ function CreatePost() {
               >
                 {isPending ? (
                   <>
-                    <Loader2 size={16} className="animate-spin" />
-                    Publishing...
+                    <Loader2 size={16} className="animate-spin" /> Publishing...
                   </>
                 ) : (
                   <>
-                    <Send size={16} />
-                    Publish Post
+                    <Send size={16} /> Publish Post
                   </>
                 )}
               </button>

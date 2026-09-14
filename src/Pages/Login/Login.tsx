@@ -1,155 +1,146 @@
-import DSButton from "../../design-system/DsButton";
-import PageHeader from "../../global/PageHeader";
-import PagesLayout from "../../global/PagesLayout";
-import { useState, type ChangeEvent, type SubmitEvent } from "react";
-import { DUMMY_BASE_URL } from "../../Contstans";
 import { Navigate, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { useMutation } from "@tanstack/react-query";
+import { loginApi } from "../../Services/login-services";
+import { useForm } from "react-hook-form";
+import PageHeader from "../../global/PageHeader";
+import { Lock, LogIn, User, AlertCircle } from "lucide-react";
+import DsButton from "../../design-system/DsButton";
+import PagesLayout from "../../global/PagesLayout";
+
+export type loginFormData = {
+  username: string;
+  password: string;
+};
 
 function Login() {
-  type FormDataType = {
-    username: string;
-    password: string;
-  };
-  const [formData, setformData] = useState<FormDataType>({
-    username: "",
-    password: "",
-  });
   const navigate = useNavigate();
-  const [isLoading, setisLoading] = useState(false);
-  const token = sessionStorage.getItem("token");
 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<loginFormData>({
+    defaultValues: { username: "", password: "" },
+  });
+
+  const { mutate: login, isPending } = useMutation({
+    mutationFn: loginApi,
+    onSuccess: (data) => {
+      sessionStorage.setItem("token", data.accessToken);
+      toast.success("You Logged In Successfully :)");
+      navigate("/app/home");
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
+  const token = sessionStorage.getItem("token");
   if (token) {
     return <Navigate to={"/app/home"} />;
   }
 
-  const loginHandeler = async () => {
-    const res = await fetch(`${DUMMY_BASE_URL}/auth/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-      
-    });
-    const data = await res.json();
-    if (res.ok) {
-      sessionStorage.setItem("token", data.accessToken);
-      return data;
-    } else {
-      return Promise.reject(data.message);
-    }
-  };
-
-  const submitHandeler = async (e: SubmitEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setisLoading(true);
-    try {
-      const data = await loginHandeler();
-      if (data) {
-        toast.success("You Logined In Successfuly :)");
-        navigate("/app/home");
-        console.log("true");
-      } else {
-        console.log(data.message);
-        toast.error("failed");
-      }
-    } catch (error) {
-      const err = error as { message: string };
-      toast.error(err.message);
-      console.log("catch");
-    } finally {
-      setisLoading(false);
-    }
-  };
-
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setformData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+  const onLogin = (formData: loginFormData) => {
+    login({ username: formData.username, password: formData.password });
   };
 
   return (
     <PagesLayout>
       <main className="flex min-h-[80vh] items-center justify-center px-4">
         <form
-          className="w-full max-w-md rounded-2xl border border-gray-600 bg-gray-800 p-8 shadow-2xl"
-          onSubmit={(e) => submitHandeler(e)}
+          className="relative w-full max-w-md overflow-hidden rounded-3xl border border-slate-700/50 bg-slate-900/80 p-8 shadow-[0_0_40px_rgba(37,99,235,0.1)] backdrop-blur-xl transition-all duration-500 animate-in fade-in slide-in-from-bottom-8 sm:p-10"
+          onSubmit={handleSubmit(onLogin)}
         >
-          <header className="mb-8 text-center">
-            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-500 text-xl font-bold text-white">
-              L
+          <header className="mb-10 text-center">
+            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-liner-to-tr from-blue-600 to-indigo-500 text-white shadow-lg shadow-blue-500/30">
+              <LogIn size={28} className="translate-x-0.5" />
             </div>
-
-            <PageHeader text="Login" />
-
-            <p className="mt-2 text-sm text-gray-400">
-              Welcome back! Please enter your details.
+            <PageHeader text="Welcome Back" />
+            <p className="mt-3 text-sm font-medium text-slate-400">
+              Please enter your details to sign in.
             </p>
           </header>
 
-          <label
-            htmlFor="username"
-            className="mb-2 block text-sm font-medium text-gray-300"
-          >
-            Username
-          </label>
+          <div className="group relative mb-5">
+            <label
+              htmlFor="username"
+              className="mb-2 flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-400 transition-colors group-focus-within:text-blue-500"
+            >
+              <span>Username</span>
+              {errors.username && (
+                <span className="flex animate-pulse items-center gap-1 rounded-md bg-red-500/20 px-2 py-1 text-[11px] font-extrabold uppercase tracking-wide text-red-400">
+                  <AlertCircle size={14} /> Required
+                </span>
+              )}
+            </label>
+            <div className="relative">
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-slate-500 transition-colors group-focus-within:text-blue-500">
+                <User size={18} />
+              </div>
+              <input
+                id="username"
+                type="text"
+                placeholder="Enter your username"
+                className={`w-full rounded-xl border bg-slate-800/50 py-3.5 pl-12 pr-4 text-white placeholder:text-slate-600 focus:bg-slate-800 focus:outline-none focus:ring-4 transition-all duration-300 ${
+                  errors.username
+                    ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/10"
+                    : "border-slate-700 focus:border-blue-500 focus:ring-blue-500/10"
+                }`}
+                {...register("username", { required: true })}
+              />
+            </div>
+          </div>
 
-          <input
-            id="username"
-            name="username"
-            type="text"
-            placeholder="Enter your username"
-            value={formData?.username}
-            onChange={handleChange}
-            className="mb-5 w-full rounded-lg border border-gray-600 bg-gray-900 px-4 py-3 text-white outline-none transition placeholder:text-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
-            required
-          />
+          <div className="group relative mb-2">
+            <label
+              htmlFor="password"
+              className="mb-2 flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-400 transition-colors group-focus-within:text-blue-500"
+            >
+              <span>Password</span>
+              {errors.password && (
+                <span className="flex animate-pulse items-center gap-1 rounded-md bg-red-500/20 px-2 py-1 text-[11px] font-extrabold uppercase tracking-wide text-red-400">
+                  <AlertCircle size={14} /> Required
+                </span>
+              )}
+            </label>
+            <div className="relative">
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-slate-500 transition-colors group-focus-within:text-blue-500">
+                <Lock size={18} />
+              </div>
+              <input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                className={`w-full rounded-xl border bg-slate-800/50 py-3.5 pl-12 pr-4 text-white placeholder:text-slate-600 focus:bg-slate-800 focus:outline-none focus:ring-4 transition-all duration-300 ${
+                  errors.password
+                    ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/10"
+                    : "border-slate-700 focus:border-blue-500 focus:ring-blue-500/10"
+                }`}
+                {...register("password", { required: true })}
+              />
+            </div>
+          </div>
 
-          <label
-            htmlFor="password"
-            className="mb-2 block text-sm font-medium text-gray-300"
-          >
-            Password
-          </label>
-
-          <input
-            id="password"
-            name="password"
-            type="password"
-            value={formData.password}
-            onChange={handleChange}
-            placeholder="Enter your password"
-            className="w-full rounded-lg border border-gray-600 bg-gray-900 px-4 py-3 text-white outline-none transition placeholder:text-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
-            required
-          />
-
-          <DSButton
-            type="button"
-            text="Forgot password?"
-            className="mt-3 mb-6 block ml-auto text-sm text-blue-400 transition hover:text-blue-300"
-            onClick={() => navigate("/reset-pass")}
-            isDisabled={isLoading}
-          />
-
-          <DSButton
-            type="submit"
-            color="blue"
-            text="Login"
-            size="lg"
-            tooltip="Login"
-            className="w-full justify-center py-3 font-semibold"
-            isLoading={isLoading}
-          />
-
-          <p className="mt-6 text-center text-sm text-gray-500">
-            Don't have an account?{" "}
+          <div className="mb-8 flex justify-end">
             <button
               type="button"
-              className="font-medium text-blue-400 transition hover:text-blue-300 "
+              className="text-sm font-semibold text-blue-400 transition-colors hover:text-blue-300 disabled:opacity-50"
+              onClick={() => navigate("/reset-pass")}
+              disabled={isPending}
             >
-              Sign up
+              Forgot password?
             </button>
-          </p>
+          </div>
+
+          <DsButton
+            type="submit"
+            color="blue"
+            text={isPending ? "Signing in..." : "Sign In"}
+            size="lg"
+            className="w-full justify-center rounded-xl py-4 font-bold shadow-lg shadow-blue-500/25 transition-transform active:scale-[0.98]"
+            isLoading={isPending}
+          />
         </form>
       </main>
     </PagesLayout>
