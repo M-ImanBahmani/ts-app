@@ -17,7 +17,6 @@ import {
   ShoppingCart,
   X,
 } from "lucide-react";
-import { DUMMY_BASE_URL } from "../Contstans";
 import { useAuthStore } from "../Stores/Auth.store";
 import { useCartStore } from "../Stores/Cart.store";
 import SidebarNavItem from "./SidebarNavItem";
@@ -34,6 +33,7 @@ const links = [
   { title: "Profile", link: "/app/profile", icon: <UserCircle size={22} /> },
   { title: "Counter", link: "/app/counter", icon: <PlusSquare size={22} /> },
   { title: "Products", link: "/app/products", icon: <Package size={22} /> },
+  { title: "MUI", link: "/app/mui", icon: <Package size={22} /> },
 ];
 
 type Props = {

@@ -14,6 +14,7 @@ import Cart from "../Pages/Cart";
 import Details from "../Pages/Posts/Components/Details";
 import NotFound from "../Pages/NotFound/NotFound";
 import CreatePost from "../Pages/Posts/Components/CreatePost";
+import MuiPage from "../Pages/Mui";
 
 
 function Routing() {
@@ -41,6 +42,7 @@ function Routing() {
         <Route path="about-us" element={<AboutUs />} />
         <Route path="counter" element={<Counter />} />
         <Route path="cart" element={<Cart />} />
+        <Route path="mui" element={<MuiPage />} />
       </Route>
 
       <Route path="*" element={<NotFound />} />

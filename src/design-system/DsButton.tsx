@@ -1,39 +1,38 @@
-import { LoaderCircle } from 'lucide-react';
-import type { ReactElement } from 'react';
+import { LoaderCircle } from "lucide-react";
+import type { ReactElement } from "react";
+import Button, { type ButtonProps } from "@mui/material/Button";
 
-type PropTypes = {
+interface PropTypes extends Omit<ButtonProps, "color" | "size"> {
   type?: "button" | "submit" | "reset";
   text?: string;
   color?: "gray" | "blue" | "red" | "green" | "black";
   size?: "lg" | "md" | "sm";
-  className? : string ,
+  className?: string;
   icon?: ReactElement;
-  isLoading? : boolean ,
-  isDisabled? : boolean ,
-  justIcon? :  boolean,
-  tooltip? : string ,
-  onClick? : () => void
-}; 
-
-
+  isLoading?: boolean;
+  isDisabled?: boolean;
+  justIcon?: boolean;
+  tooltip?: string;
+  onClick?: () => void;
+}
 
 const DsButton = ({
-  type,
+  type = "button",
   text,
-  color = 'gray',
-  size = 'md',
-  className = '',
+  color = "gray",
+  size = "md",
+  className = "",
   icon,
   isLoading = false,
   isDisabled = false,
   justIcon = false,
-  tooltip = '',
-  onClick
-} : PropTypes ) => {
-
-
-  let colorClass = '';
-  let sizeClass = '';
+  tooltip = "",
+  onClick,
+  children,
+  ...rest
+}: PropTypes) => {
+  let colorClass = "";
+  let sizeClass = "";
 
   switch (color) {
     case "green":
@@ -54,28 +53,33 @@ const DsButton = ({
   }
 
   switch (size) {
-    case 'lg': sizeClass = `rounded-lg py-2 px-3 text-xl ${justIcon ? 'h-10 w-10 p-0' : ''}`;
+    case "lg":
+      sizeClass = `rounded-lg py-2 px-3 text-xl ${justIcon ? "h-10 w-10 p-0" : ""}`;
       break;
-    case 'md': sizeClass = `rounded-md py-1 px-2 text-base ${justIcon ? 'h-8 w-8 p-0' : ''}`;
+    case "md":
+      sizeClass = `rounded-md py-1 px-2 text-base ${justIcon ? "h-8 w-8 p-0" : ""}`;
       break;
-    case 'sm': sizeClass = `rounded-sm py-1 px-1.5 text-sm ${justIcon ? 'h-6 w-6 p-0' : ''}`;
+    case "sm":
+      sizeClass = `rounded-sm py-1 px-1.5 text-sm ${justIcon ? "h-6 w-6 p-0" : ""}`;
       break;
-
   }
 
   return (
-    <button
+    <Button
       type={type}
       className={`cursor-pointer transition-all flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed! ${colorClass} ${sizeClass} ${className}`}
       onClick={onClick}
-      disabled={isLoading || isDisabled ? true : false}
+      disabled={isLoading || isDisabled}
       title={tooltip}
+      {...rest}
     >
       {!isLoading && icon ? icon : null}
-      {isLoading ? <LoaderCircle size={18} className='animate-spin' /> : undefined}
-      {text}
-    </button>
-  )
-}
+      {isLoading ? (
+        <LoaderCircle size={18} className="animate-spin" />
+      ) : undefined}
+      {text || children}
+    </Button>
+  );
+};
 
-export default DsButton
+export default DsButton;
