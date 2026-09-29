@@ -1,38 +1,98 @@
-import { Outlet } from "react-router-dom";
-import NavHeader from "../global/NavHeader";
-import { useState } from "react";
+import AppBar from "@mui/material/AppBar";
+import Box from "@mui/material/Box";
+import IconButton from "@mui/material/IconButton";
+import Toolbar from "@mui/material/Toolbar";
 import { Menu } from "lucide-react";
+import { useState } from "react";
+import { Outlet } from "react-router-dom";
+import DsTypography from "../design-system/DsTypography";
+import NavHeader from "../global/NavHeader";
 
 function AppLayout() {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   return (
-    // ثابت کردن ارتفاع کل صفحه و جلوگیری از اسکرول خوردن کادر اصلی
-    <div className="flex h-screen w-full overflow-hidden bg-slate-900">
+    // Box جایگزین div اصلی شده و ارتفاع کل صفحه را قفل می‌کند
+    <Box
+      sx={{
+        display: "flex",
+        height: "100vh",
+        width: "100%",
+        overflow: "hidden",
+        bgcolor: "background.default",
+      }}
+    >
       <NavHeader
         isMobileOpen={isMobileOpen}
         setIsMobileOpen={setIsMobileOpen}
       />
 
-      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-        <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center justify-between border-b border-slate-800 bg-slate-900/80 px-6 backdrop-blur-md md:hidden">
-          <div className="flex items-center gap-3">
-            <button
+      {/* ظرف دربرگیرنده هدر موبایل و محتوای اصلی */}
+      <Box
+        sx={{
+          display: "flex",
+          flexGrow: 1,
+          flexDirection: "column",
+          minWidth: 0,
+          overflow: "hidden",
+        }}
+      >
+        {/* AppBar جایگزین header تیلویند شده است (فقط در موبایل نمایش داده می‌شود) */}
+        <AppBar
+          position="sticky"
+          elevation={0} // حذف سایه پیش‌فرض متریال
+          sx={{
+            display: { xs: "block", md: "none" }, // معادل md:hidden
+            bgcolor: "rgba(15, 23, 42, 0.8)", // حالت شیشه‌ای پس‌زمینه
+            backdropFilter: "blur(12px)",
+            borderBottom: "1px solid",
+            borderColor: "divider", // رنگ خط زیرین را از تم می‌خواند
+          }}
+        >
+          <Toolbar sx={{ minHeight: "64px", px: 3, gap: 2 }}>
+            <IconButton
               onClick={() => setIsMobileOpen(true)}
-              className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-700 bg-slate-800 text-slate-300 hover:bg-blue-600 hover:text-white"
+              edge="start"
+              sx={{
+                bgcolor: "background.paper",
+                border: "1px solid",
+                borderColor: "divider",
+                borderRadius: "12px",
+                color: "text.secondary",
+                transition: "all 0.3s",
+                "&:hover": {
+                  bgcolor: "primary.main",
+                  color: "primary.contrastText",
+                },
+              }}
             >
               <Menu size={20} />
-            </button>
-            <span className="font-bold text-white">My Dashboard</span>
-          </div>
-        </header>
+            </IconButton>
 
-        {/* محتوای اصلی به صورت مستقل اسکرول می‌خورد */}
-        <main className="flex-1 overflow-y-auto p-6 text-gray-200 sm:p-8">
+            <DsTypography
+              variant="subtitle1"
+              sx={{ fontWeight: "bold" }}
+              color="text.primary"
+            >
+              My Dashboard
+            </DsTypography>
+          </Toolbar>
+        </AppBar>
+
+        {/* محتوای اصلی با قابلیت اسکرول مستقل */}
+        <Box
+          component="main"
+          sx={{
+            flexGrow: 1,
+            overflowY: "auto",
+            p: { xs: 3, sm: 4 }, // معادل p-6 و sm:p-8
+            color: "text.primary",
+          }}
+        >
           <Outlet />
-        </main>
-      </div>
-    </div>
+        </Box>
+      </Box>
+    </Box>
   );
 }
 

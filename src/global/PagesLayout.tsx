@@ -1,10 +1,24 @@
 import type { FC, PropsWithChildren } from "react";
+import Box from "@mui/material/Box";
 
-const PagesLayout : FC<PropsWithChildren> = ({ children }) =>{
+const PagesLayout: FC<PropsWithChildren> = ({ children }) => {
   return (
-    <main className="flex flex-col min-h-screen bg-slate-900 justify-center items-center text-gray-200 p-8">
+    <Box
+      component="main"
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        minHeight: "100vh",
+        bgcolor: "background.default", // جایگزین bg-slate-900
+        justifyContent: "center",
+        alignItems: "center",
+        color: "text.primary",
+        p: 4, // در MUI مقدار p:4 معادل ۳۲ پیکسل (همان p-8 تیلویند) است
+      }}
+    >
       {children}
-    </main>
+    </Box>
   );
-}
+};
+
 export default PagesLayout;

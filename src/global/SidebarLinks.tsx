@@ -1,4 +1,3 @@
-import { NavLink } from "react-router-dom";
 import {
   Home,
   FileText,
@@ -8,6 +7,8 @@ import {
   PlusSquare,
   Package,
 } from "lucide-react";
+import List from "@mui/material/List";
+import SidebarNavItem from "./SidebarNavItem";
 
 const links = [
   { title: "Home", link: "/app/home", icon: <Home size={22} /> },
@@ -30,40 +31,27 @@ export default function SidebarLinks({
   isMobileOpen,
   onLinkClick,
 }: Props) {
+  // فرمول محاسبه باز بودن سایدبار که قبلاً در هدر داشتیم
+  const isExpanded = isOpen || isMobileOpen;
+
   return (
-    <nav className="flex-1 overflow-y-auto overflow-x-hidden px-3 py-4">
-      <ul className="flex flex-col gap-2">
-        {links.map((item, index) => (
-          <li key={index}>
-            <NavLink
-              to={item.link}
-              onClick={onLinkClick}
-              className={({ isActive }) =>
-                `flex items-center rounded-xl transition-all duration-300 ${
-                  isOpen || isMobileOpen
-                    ? "justify-start px-4 py-3"
-                    : "md:justify-center md:p-3 justify-start px-4 py-3"
-                } ${
-                  isActive
-                    ? "bg-blue-600 text-white shadow-lg shadow-blue-900/20"
-                    : "text-slate-400 hover:bg-slate-800 hover:text-white"
-                }`
-              }
-            >
-              <span className="shrink-0">{item.icon}</span>
-              <span
-                className={`font-medium transition-all duration-300 overflow-hidden whitespace-nowrap ${
-                  isOpen || isMobileOpen
-                    ? "ml-4 w-auto opacity-100"
-                    : "md:ml-0 md:w-0 md:opacity-0 ml-4 w-auto opacity-100"
-                }`}
-              >
-                {item.title}
-              </span>
-            </NavLink>
-          </li>
-        ))}
-      </ul>
-    </nav>
+    <List
+      sx={{
+        flexGrow: 1,
+        overflowY: "auto",
+        overflowX: "hidden",
+        px: 1.5,
+        py: 2,
+      }}
+    >
+      {links.map((item, index) => (
+        <SidebarNavItem
+          key={index}
+          item={item}
+          isExpanded={isExpanded}
+          onClick={onLinkClick}
+        />
+      ))}
+    </List>
   );
 }

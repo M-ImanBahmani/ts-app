@@ -1,22 +1,50 @@
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import Button from "@mui/material/Button";
+import Box from "@mui/material/Box";
 
 type Props = { to: string; text?: string };
 
 export default function SharedBackButton({ to, text = "Back" }: Props) {
   const navigate = useNavigate();
+
   return (
-    <div className="mx-auto mb-6 max-w-3xl">
-      <button
+    <Box sx={{ mx: "auto", mb: 3, maxWidth: "md" }}>
+      <Button
         onClick={() => navigate(to)}
-        className="group flex items-center gap-2.5 rounded-full border border-slate-200 bg-white/80 px-6 py-2.5 text-sm font-bold text-slate-700 shadow-sm backdrop-blur-md transition-all duration-300 hover:-translate-x-2 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600 hover:shadow-md dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-300 dark:hover:border-blue-900/50 dark:hover:bg-slate-800 dark:hover:text-blue-400"
+        startIcon={<ArrowLeft size={18} />}
+        disableElevation
+        sx={{
+          borderRadius: "9999px", // کاملاً گرد
+          px: 3,
+          py: 1,
+          fontWeight: "bold",
+          textTransform: "none",
+          bgcolor: "background.paper", // اتوماتیک در حالت دارک و لایت تنظیم می‌شود
+          color: "text.secondary",
+          border: "1px solid",
+          borderColor: "divider",
+          backdropFilter: "blur(12px)", // افکت شیشه‌ای
+          transition: "all 0.3s ease",
+          boxShadow: 1,
+          "& .lucide": {
+            // تارگت کردن مستقیم آیکون برای انیمیشن
+            transition: "transform 0.3s ease",
+          },
+          "&:hover": {
+            bgcolor: "action.hover",
+            borderColor: "primary.main",
+            color: "primary.main",
+            transform: "translateX(-8px)", // افکت پرش به چپ
+            boxShadow: 3,
+            "& .lucide": {
+              transform: "translateX(-4px)",
+            },
+          },
+        }}
       >
-        <ArrowLeft
-          size={18}
-          className="transition-transform duration-300 group-hover:-translate-x-1"
-        />
         {text}
-      </button>
-    </div>
+      </Button>
+    </Box>
   );
 }
