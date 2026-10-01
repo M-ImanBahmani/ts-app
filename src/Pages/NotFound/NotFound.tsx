@@ -1,44 +1,87 @@
 import { useNavigate } from "react-router-dom";
-import { Home } from "lucide-react";
+import { Bold, Home } from "lucide-react";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import DsButton from "../../design-system/DsButton";
+import DsTypography from "../../design-system/DsTypography";
 
 function NotFound() {
   const navigate = useNavigate();
 
   return (
-    // استفاده مستقیم از رنگ‌های تیره برای پس‌زمینه و متن کل صفحه
-    <div className="flex min-h-screen flex-col items-center justify-center bg-slate-900 px-4 text-center text-slate-100">
-      <div className="relative">
-        {/* عدد 404 با رنگ تیره جذاب و سایه */}
-        <h1 className="text-9xl font-extrabold tracking-widest text-slate-800 drop-shadow-2xl sm:text-[12rem]">
+    <Box
+      sx={{
+        display: "flex",
+        minHeight: "100vh",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        bgcolor: "background.default",
+        px: 2,
+        textAlign: "center",
+      }}
+    >
+      <Box sx={{ position: "relative", mb: 4 }}>
+        <Typography
+          variant="h1"
+          sx={{
+            fontSize: { xs: "8rem", sm: "12rem" },
+            fontWeight: 900,
+            letterSpacing: "0.1em",
+            color: "text.primary",
+            opacity: 0.1, // افکت سایه‌وار برای عدد 404
+            lineHeight: 1,
+          }}
+        >
           404
-        </h1>
-        {/* لیبل آبی رنگ روی عدد */}
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-12 rounded bg-blue-600 px-4 py-1 text-sm font-bold text-white shadow-lg shadow-blue-900/50">
+        </Typography>
+
+        <Box
+          sx={{
+            position: "absolute",
+            left: "50%",
+            top: "50%",
+            transform: "translate(-50%, -50%) rotate(-12deg)",
+            bgcolor: "primary.main",
+            color: "white",
+            px: 2,
+            py: 0.5,
+            borderRadius: 1,
+            fontWeight: "bold",
+            boxShadow: 3,
+          }}
+        >
           Page Not Found
-        </div>
-      </div>
+        </Box>
+      </Box>
 
-      <h2 className="mt-8 text-2xl font-bold text-slate-200 md:text-3xl">
+      <DsTypography
+        variant="h4"
+        color="text.primary"
+        sx={{ fontWeight: "bold" }}
+        gutterBottom
+      >
         Looks like you've lost your way.
-      </h2>
+      </DsTypography>
 
-      <p className="mt-4 max-w-md text-slate-400">
+      <Typography
+        variant="body1"
+        color="text.secondary"
+        sx={{ maxWidth: 400, mb: 5 }}
+      >
         The page you are looking for doesn't exist, has been removed, or is
         temporarily unavailable.
-      </p>
+      </Typography>
 
-      {/* دکمه بازگشت به هوم پیج با هاور انیمیشنی */}
-      <button
+      <DsButton
+        text="Back to Home"
+        icon={<Home size={18} />}
+        color="blue"
+        size="lg"
+        className="rounded-full px-8 py-3.5 shadow-lg"
         onClick={() => navigate("/app/home")}
-        className="group mt-10 flex items-center gap-2.5 rounded-full bg-blue-600 px-8 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-600/20 transition-all duration-300 hover:-translate-y-1 hover:bg-blue-500 hover:shadow-blue-500/40"
-      >
-        <Home
-          size={18}
-          className="transition-transform duration-300 group-hover:-translate-y-0.5"
-        />
-        Back to Home
-      </button>
-    </div>
+      />
+    </Box>
   );
 }
 

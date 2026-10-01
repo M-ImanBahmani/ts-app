@@ -1,35 +1,96 @@
 import { ShoppingCart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import DsButton from "../../../design-system/DsButton";
+import DsTypography from "../../../design-system/DsTypography";
+
+import Box from "@mui/material/Box";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
 
 export default function EmptyCart() {
   const navigate = useNavigate();
+
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 p-6 transition-colors duration-300 dark:bg-slate-900">
-      <div className="flex flex-col items-center gap-6 rounded-2xl border border-gray-200 bg-white p-12 text-center shadow-sm dark:border-slate-700 dark:bg-slate-800">
-        <div className="flex h-24 w-24 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-700">
-          <ShoppingCart
-            size={48}
-            className="text-slate-400 dark:text-slate-500"
+    <Box
+      sx={{
+        display: "flex",
+        minHeight: "100vh",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        bgcolor: "background.default",
+        p: 3,
+        transition: "background-color 0.3s",
+      }}
+    >
+      <Card
+        sx={{
+          borderRadius: 4,
+          bgcolor: "background.paper",
+          boxShadow: 1,
+          border: "1px solid",
+          borderColor: "divider",
+          maxWidth: 480,
+          width: "100%",
+        }}
+      >
+        <CardContent
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            p: { xs: 4, md: 6 },
+            textAlign: "center",
+            gap: 3,
+          }}
+        >
+          {/* دایره پس‌زمینه آیکون */}
+          <Box
+            sx={{
+              display: "flex",
+              height: 96,
+              width: 96,
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: "50%",
+              bgcolor: "action.hover",
+              color: "text.secondary", // رنگ آیکون را بر اساس تم لایت/دارک تنظیم می‌کند
+            }}
+          >
+            <ShoppingCart size={48} />
+          </Box>
+
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+            <DsTypography
+              element="h2"
+              variant="h5"
+              color="text.primary"
+              sx={{ fontWeight: "bold" }}
+            >
+              Your Cart is Empty
+            </DsTypography>
+
+            <DsTypography
+              element="p"
+              variant="body1"
+              color="text.secondary"
+              sx={{ maxWidth: 350, mx: "auto", lineHeight: 1.6 }}
+            >
+              Looks like you haven't added anything to your cart yet. Discover
+              our latest products and find what you love!
+            </DsTypography>
+          </Box>
+
+          <DsButton
+            text="Start Shopping"
+            icon={<ShoppingCart size={18} />}
+            color="blue"
+            size="lg"
+            className="mt-4 px-8 py-3 shadow-lg shadow-blue-500/20 rounded-xl"
+            onClick={() => navigate("/app/products")}
           />
-        </div>
-        <div className="space-y-2">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Your Cart is Empty
-          </h2>
-          <p className="max-w-sm text-gray-500 dark:text-gray-400">
-            Looks like you haven't added anything to your cart yet. Discover our
-            latest products and find what you love!
-          </p>
-        </div>
-        <DsButton
-          text="Start Shopping"
-          icon={<ShoppingCart size={18} />}
-          color="blue"
-          className="mt-4 rounded-xl px-6 py-3 font-semibold shadow-lg shadow-blue-500/20"
-          onClick={() => navigate("/app/products")}
-        />
-      </div>
-    </div>
+        </CardContent>
+      </Card>
+    </Box>
   );
 }

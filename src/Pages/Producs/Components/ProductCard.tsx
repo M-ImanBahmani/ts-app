@@ -1,7 +1,12 @@
 import { Minus, Plus, ShoppingCart, Star, Trash2 } from "lucide-react";
-import DsButton from "../../../design-system/DsButton";
 import type { ProductTypes } from "../../../Types/Product";
 import { useCartStore } from "../../../Stores/Cart.store";
+
+import Box from "@mui/material/Box";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import IconButton from "@mui/material/IconButton";
+import DsTypography from "../../../design-system/DsTypography";
 
 function ProductCard({ product }: { product: ProductTypes }) {
   const { addToCart, decreaseQuantity, cartItems } = useCartStore();
@@ -9,84 +14,265 @@ function ProductCard({ product }: { product: ProductTypes }) {
   const quantity = cartItem?.quantity || 0;
 
   return (
-    <div
-      key={product.id}
-      className="group relative flex h-full flex-col overflow-hidden rounded-[2rem] bg-white p-3 shadow-sm ring-1 ring-slate-100 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-blue-500/10 hover:ring-blue-100 dark:bg-slate-800/80 dark:ring-slate-700/50 dark:hover:shadow-blue-900/20 dark:hover:ring-blue-900/50"
+    <Card
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
+        borderRadius: 4,
+        bgcolor: "background.paper",
+        boxShadow: 1,
+        border: "1px solid",
+        borderColor: "divider",
+        transition: "all 0.4s ease",
+        "&:hover": {
+          transform: "translateY(-8px)",
+          boxShadow: 4,
+          borderColor: "primary.light",
+        },
+        "&:hover .product-img": {
+          transform: "scale(1.1)",
+        },
+      }}
     >
-      {/* بخش تصویر محصول به صورت باکس داخلی (Inner Box) */}
-      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-700 dark:to-slate-800">
-        <img
+      {/* بخش تصویر */}
+      <Box
+        sx={{
+          position: "relative",
+          width: "100%",
+          pt: "75%",
+          overflow: "hidden",
+          bgcolor: "action.hover",
+        }}
+      >
+        <Box
+          component="img"
           src={product.thumbnail || product.images?.[0]}
           alt={product.title}
-          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+          className="product-img"
+          sx={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            transition: "transform 0.7s ease",
+          }}
         />
 
-        {/* بج تخفیف - گوشه چپ */}
-        <div className="absolute left-3 top-3 rounded-full bg-gradient-to-r from-red-500 to-rose-500 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-white shadow-md">
+        <Box
+          sx={{
+            position: "absolute",
+            top: 12,
+            left: 12,
+            borderRadius: 10,
+            background: "linear-gradient(to right, #ef4444, #f43f5e)",
+            px: 1.5,
+            py: 0.5,
+            fontSize: "0.65rem",
+            fontWeight: 900,
+            color: "white",
+            boxShadow: 2,
+            letterSpacing: 1,
+          }}
+        >
           {product.discountPercentage}% OFF
-        </div>
+        </Box>
 
-        {/* بج امتیاز - شناور پایین تصویر */}
-        <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-white/90 px-3 py-1.5 text-xs font-bold text-slate-800 shadow-sm backdrop-blur-md dark:bg-slate-900/90 dark:text-slate-100">
-          <Star className="fill-amber-400 text-amber-400" size={14} />
+        <Box
+          sx={{
+            position: "absolute",
+            bottom: 12,
+            left: "50%",
+            transform: "translateX(-50%)",
+            display: "flex",
+            alignItems: "center",
+            gap: 0.5,
+            borderRadius: 10,
+            bgcolor: "background.paper",
+            color: "text.primary",
+            px: 1.5,
+            py: 0.5,
+            fontSize: "0.75rem",
+            fontWeight: "bold",
+            boxShadow: 2,
+          }}
+        >
+          <Star className="text-amber-400 fill-amber-400" size={14} />
           {product.rating}
-        </div>
-      </div>
+        </Box>
+      </Box>
 
       {/* مشخصات محصول */}
-      <div className="flex flex-1 flex-col px-3 pt-5 pb-2">
-        <span className="mb-2 w-fit rounded-lg bg-blue-50/50 px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-blue-600 dark:bg-blue-500/10 dark:text-blue-400">
+      <CardContent
+        sx={{
+          display: "flex",
+          flex: 1,
+          flexDirection: "column",
+          p: 2.5,
+          "&:last-child": { pb: 2.5 },
+        }}
+      >
+        <Box
+          sx={{
+            mb: 1.5,
+            width: "fit-content",
+            borderRadius: 2,
+            bgcolor: "primary.light",
+            color: "primary.dark",
+            px: 1.25,
+            py: 0.5,
+            fontSize: "0.65rem",
+            fontWeight: 900,
+            textTransform: "uppercase",
+            letterSpacing: 1,
+            opacity: 0.8,
+          }}
+        >
           {product.category}
-        </span>
+        </Box>
 
-        <h3 className="mb-1.5 line-clamp-1 text-lg font-extrabold text-slate-900 dark:text-white">
+        {/* ترفند line-clamp برای عنوان */}
+        <DsTypography
+          element="h3"
+          variant="h6"
+          color="text.primary"
+          sx={{
+            mb: 1,
+            fontWeight: 900,
+            display: "-webkit-box",
+            WebkitLineClamp: 1,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+          }}
+        >
           {product.title}
-        </h3>
+        </DsTypography>
 
-        <p className="line-clamp-2 text-sm leading-relaxed text-slate-500 dark:text-slate-400">
+        {/* ترفند line-clamp برای توضیحات */}
+        <DsTypography
+          element="p"
+          variant="body2"
+          color="text.secondary"
+          sx={{
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+            lineHeight: 1.6,
+          }}
+        >
           {product.description}
-        </p>
+        </DsTypography>
 
-        {/* قیمت و دکمه‌ها - طراحی جدید یکپارچه */}
-        <div className="mt-auto flex items-center justify-between pt-6">
-          <div className="flex flex-col">
-            <span className="text-xs font-semibold text-slate-400 line-through">
+        {/* قیمت و دکمه‌ها */}
+        <Box
+          sx={{
+            mt: "auto",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            pt: 3,
+          }}
+        >
+          <Box sx={{ display: "flex", flexDirection: "column" }}>
+            <DsTypography
+              element="span"
+              variant="caption"
+              sx={{
+                fontWeight: "bold",
+                color: "text.disabled",
+                textDecoration: "line-through",
+              }}
+            >
               ${(product.price * 1.2).toFixed(2)}
-            </span>
-            <span className="text-2xl font-black text-slate-900 dark:text-white">
+            </DsTypography>
+            <DsTypography
+              element="span"
+              variant="h5"
+              color="text.primary"
+              sx={{ fontWeight: 900 }}
+            >
               ${product.price}
-            </span>
-          </div>
+            </DsTypography>
+          </Box>
 
           {quantity === 0 ? (
-            <button
+            <IconButton
               onClick={() => addToCart(product)}
-              className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-900 text-white transition-all hover:scale-105 hover:bg-blue-600 hover:shadow-lg hover:shadow-blue-500/30 active:scale-95 dark:bg-blue-600 dark:hover:bg-blue-500"
+              sx={{
+                width: 48,
+                height: 48,
+                borderRadius: 3,
+                bgcolor: "primary.main",
+                color: "white",
+                transition: "all 0.2s",
+                "&:hover": {
+                  bgcolor: "primary.dark",
+                  transform: "scale(1.05)",
+                  boxShadow: 3,
+                },
+              }}
             >
               <ShoppingCart size={20} />
-            </button>
+            </IconButton>
           ) : (
-            <div className="flex h-12 items-center gap-3 rounded-2xl bg-slate-100 p-1.5 dark:bg-slate-700">
-              <button
+            <Box
+              sx={{
+                display: "flex",
+                height: 48,
+                alignItems: "center",
+                gap: 1.5,
+                borderRadius: 3,
+                bgcolor: "action.hover",
+                p: 0.75,
+              }}
+            >
+              <IconButton
                 onClick={() => decreaseQuantity(product.id)}
-                className="flex h-9 w-9 items-center justify-center rounded-xl bg-white text-rose-500 shadow-sm transition-transform active:scale-90 dark:bg-slate-800"
+                sx={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: 2,
+                  bgcolor: "background.paper",
+                  color: "error.main",
+                  boxShadow: 1,
+                  "&:hover": { bgcolor: "background.paper" },
+                }}
               >
                 {quantity === 1 ? <Trash2 size={16} /> : <Minus size={16} />}
-              </button>
-              <span className="w-5 text-center font-bold text-slate-900 dark:text-white">
+              </IconButton>
+
+              <DsTypography
+                element="span"
+                variant="body1"
+                color="text.primary"
+                sx={{ width: 24, textAlign: "center", fontWeight: "bold" }}
+              >
                 {quantity}
-              </span>
-              <button
+              </DsTypography>
+
+              <IconButton
                 onClick={() => addToCart(product)}
-                className="flex h-9 w-9 items-center justify-center rounded-xl bg-white text-blue-600 shadow-sm transition-transform active:scale-90 dark:bg-slate-800 dark:text-blue-400"
+                sx={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: 2,
+                  bgcolor: "background.paper",
+                  color: "primary.main",
+                  boxShadow: 1,
+                  "&:hover": { bgcolor: "background.paper" },
+                }}
               >
                 <Plus size={16} />
-              </button>
-            </div>
+              </IconButton>
+            </Box>
           )}
-        </div>
-      </div>
-    </div>
+        </Box>
+      </CardContent>
+    </Card>
   );
 }
+
 export default ProductCard;

@@ -9,6 +9,13 @@ import PageHeader from "../../global/PageHeader";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../Stores/Auth.store";
 
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import Avatar from "@mui/material/Avatar";
+import DsTypography from "../../design-system/DsTypography";
+
 function Profile() {
   const { user } = useAuthStore();
   const navigate = useNavigate();
@@ -20,122 +27,398 @@ function Profile() {
 
   if (!user) {
     return (
-      <div className="flex min-h-[80vh] flex-col items-center justify-center px-4">
-        <div className="flex flex-col items-center gap-6">
-          <div className="relative flex h-24 w-24 items-center justify-center rounded-full border border-slate-600 bg-slate-800 shadow-[0_0_30px_rgba(59,130,246,0.15)]">
-            <div
-              className="absolute inset-0 animate-ping rounded-full border border-blue-400/50"
-              style={{ animationDuration: "1.5s" }}
-            ></div>
-            <LoaderCircle className="h-10 w-10 animate-spin text-blue-500" />
-          </div>
-          <div className="flex flex-col items-center gap-2 text-center">
-            <h3 className="animate-pulse text-xl font-bold tracking-wide text-white">
+      <Box
+        sx={{
+          display: "flex",
+          minHeight: "80vh",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          px: 2,
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 3,
+          }}
+        >
+          <Box
+            sx={{
+              position: "relative",
+              display: "flex",
+              height: 96,
+              width: 96,
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: "50%",
+              border: "1px solid",
+              borderColor: "divider",
+              bgcolor: "background.paper",
+              boxShadow: "0 0 30px rgba(59,130,246,0.15)",
+            }}
+          >
+            <Box
+              sx={{
+                position: "absolute",
+                inset: 0,
+                borderRadius: "50%",
+                border: "1px solid rgba(96, 165, 250, 0.5)",
+                animation: "ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite",
+              }}
+            />
+            <LoaderCircle className="animate-spin text-blue-500" size={40} />
+          </Box>
+          <Box sx={{ textAlign: "center" }}>
+            <DsTypography
+              element="h3"
+              variant="h6"
+              color="text.primary"
+              sx={{
+                fontWeight: "bold",
+                animation: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+              }}
+            >
               Loading Profile Data
-            </h3>
-            <p className="text-sm text-slate-400">
+            </DsTypography>
+            <DsTypography
+              element="p"
+              variant="body2"
+              color="text.secondary"
+              sx={{ mt: 1 }}
+            >
               Please wait while we fetch your information...
-            </p>
-          </div>
-        </div>
-      </div>
+            </DsTypography>
+          </Box>
+        </Box>
+      </Box>
     );
   }
 
   return (
-    <div className="min-h-[80vh] w-full p-4 transition-colors duration-300 sm:p-6 lg:p-8">
+    <Box sx={{ minHeight: "80vh", w: "100%", p: { xs: 2, sm: 3, lg: 4 } }}>
       <PageHeader text="User Dashboard" />
 
-      <div className="mx-auto mt-8 max-w-4xl space-y-6">
-        {/* هدر پروفایل (سبک کارت‌های شناسایی دیجیتال) */}
-        <div className="relative overflow-hidden rounded-4xl border border-white/20 bg-white/40 p-8 shadow-xl backdrop-blur-xl dark:border-slate-700/50 dark:bg-slate-800/40">
-          {/* افکت‌های نوری پس‌زمینه */}
-          <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-blue-500/10 blur-3xl dark:bg-blue-600/20"></div>
-          <div className="absolute -bottom-20 -left-20 h-64 w-64 rounded-full bg-purple-500/10 blur-3xl dark:bg-purple-600/20"></div>
+      <Box
+        sx={{
+          mx: "auto",
+          mt: 4,
+          maxWidth: "md",
+          display: "flex",
+          flexDirection: "column",
+          gap: 4,
+        }}
+      >
+        {/* هدر پروفایل */}
+        <Card
+          sx={{
+            position: "relative",
+            overflow: "hidden",
+            borderRadius: 4,
+            border: "1px solid",
+            borderColor: "divider",
+            bgcolor: "background.paper",
+            boxShadow: 3,
+          }}
+        >
+          <Box
+            sx={{
+              position: "absolute",
+              right: -80,
+              top: -80,
+              height: 256,
+              width: 256,
+              borderRadius: "50%",
+              bgcolor: "primary.light",
+              opacity: 0.1,
+              filter: "blur(60px)",
+            }}
+          />
+          <Box
+            sx={{
+              position: "absolute",
+              left: -80,
+              bottom: -80,
+              height: 256,
+              width: 256,
+              borderRadius: "50%",
+              bgcolor: "secondary.light",
+              opacity: 0.1,
+              filter: "blur(60px)",
+            }}
+          />
 
-          <div className="relative flex flex-col items-center gap-6 sm:flex-row sm:items-start">
-            <div className="relative">
-              <div className="absolute -inset-1 rounded-full bg-liner-to-tr from-blue-600 to-purple-600 blur opacity-70"></div>
-              <img
+          <CardContent
+            sx={{
+              position: "relative",
+              display: "flex",
+              flexDirection: { xs: "column", sm: "row" },
+              alignItems: { xs: "center", sm: "flex-start" },
+              gap: 4,
+              p: 4,
+            }}
+          >
+            <Box sx={{ position: "relative" }}>
+              <Avatar
                 src={user.image}
-                alt="Avatar"
-                className="relative h-32 w-32 rounded-full border-4 border-white object-cover shadow-2xl dark:border-slate-800"
+                sx={{
+                  width: 128,
+                  height: 128,
+                  border: "4px solid",
+                  borderColor: "background.default",
+                  boxShadow: 3,
+                }}
               />
-              <div className="absolute bottom-2 right-2 flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-green-500 text-white dark:border-slate-800">
+              <Box
+                sx={{
+                  position: "absolute",
+                  bottom: 8,
+                  right: 8,
+                  display: "flex",
+                  height: 32,
+                  width: 32,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderRadius: "50%",
+                  border: "2px solid",
+                  borderColor: "background.default",
+                  bgcolor: "success.main",
+                  color: "white",
+                }}
+              >
                 <CheckCircle2 size={16} />
-              </div>
-            </div>
+              </Box>
+            </Box>
 
-            <div className="flex flex-1 flex-col items-center pt-2 sm:items-start">
-              <span className="mb-2 inline-block rounded-full bg-blue-100 px-3 py-1 text-xs font-extrabold uppercase tracking-widest text-blue-700 dark:bg-blue-500/20 dark:text-blue-400">
+            <Box
+              sx={{
+                display: "flex",
+                flex: 1,
+                flexDirection: "column",
+                alignItems: { xs: "center", sm: "flex-start" },
+                pt: 1,
+              }}
+            >
+              <Box
+                sx={{
+                  mb: 2,
+                  borderRadius: 4,
+                  bgcolor: "primary.light",
+                  color: "primary.dark",
+                  px: 2,
+                  py: 0.5,
+                  fontSize: "0.75rem",
+                  fontWeight: "bold",
+                  textTransform: "uppercase",
+                  letterSpacing: 1,
+                }}
+              >
                 Verified Member
-              </span>
-              <h2 className="text-3xl font-black text-slate-900 dark:text-white">
+              </Box>
+              <DsTypography
+                element="h2"
+                variant="h4"
+                color="text.primary"
+                sx={{ fontWeight: 900 }}
+              >
                 {user.firstName} {user.lastName}
-              </h2>
-              <p className="text-lg font-medium text-slate-500 dark:text-slate-400">
+              </DsTypography>
+              <DsTypography
+                element="p"
+                variant="h6"
+                color="text.secondary"
+                sx={{ fontWeight: "medium", mt: 0.5 }}
+              >
                 @{user.username}
-              </p>
-            </div>
-          </div>
-        </div>
+              </DsTypography>
+            </Box>
+          </CardContent>
+        </Card>
 
-        {/* گرید اطلاعات (Bento Box Style) */}
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          {/* ایمیل */}
-          <div className="flex items-center gap-5 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition-transform hover:-translate-y-1 dark:border-slate-700 dark:bg-slate-800">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400">
-              <Mail size={24} />
-            </div>
-            <div>
-              <p className="text-sm font-bold tracking-wide text-slate-400">
-                Email Address
-              </p>
-              <p className="mt-1 font-semibold text-slate-800 dark:text-slate-200">
-                {user.email}
-              </p>
-            </div>
-          </div>
+        {/* گرید اطلاعات */}
+        <Grid container spacing={3}>
+          <Grid size={{ xs: 12, md: 6 }}>
+            <Card
+              sx={{
+                borderRadius: 4,
+                border: "1px solid",
+                borderColor: "divider",
+                bgcolor: "background.paper",
+                boxShadow: 1,
+                transition: "transform 0.2s",
+                "&:hover": { transform: "translateY(-4px)" },
+              }}
+            >
+              <CardContent
+                sx={{ display: "flex", alignItems: "center", gap: 3, p: 3 }}
+              >
+                <Box
+                  sx={{
+                    display: "flex",
+                    height: 56,
+                    width: 56,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    borderRadius: 3,
+                    bgcolor: "info.light",
+                    color: "info.dark",
+                  }}
+                >
+                  <Mail size={24} />
+                </Box>
+                <Box>
+                  <DsTypography
+                    element="p"
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ fontWeight: "bold", letterSpacing: 1 }}
+                  >
+                    Email Address
+                  </DsTypography>
+                  <DsTypography
+                    element="p"
+                    variant="body1"
+                    color="text.primary"
+                    sx={{ fontWeight: "bold", mt: 0.5 }}
+                  >
+                    {user.email}
+                  </DsTypography>
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
 
-          {/* جنسیت */}
-          <div className="flex items-center gap-5 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition-transform hover:-translate-y-1 dark:border-slate-700 dark:bg-slate-800">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-purple-50 text-purple-600 dark:bg-purple-500/10 dark:text-purple-400">
-              <UserCircle size={24} />
-            </div>
-            <div>
-              <p className="text-sm font-bold tracking-wide text-slate-400">
-                Gender
-              </p>
-              <p className="mt-1 font-semibold capitalize text-slate-800 dark:text-slate-200">
-                {user.gender}
-              </p>
-            </div>
-          </div>
+          <Grid size={{ xs: 12, md: 6 }}>
+            <Card
+              sx={{
+                borderRadius: 4,
+                border: "1px solid",
+                borderColor: "divider",
+                bgcolor: "background.paper",
+                boxShadow: 1,
+                transition: "transform 0.2s",
+                "&:hover": { transform: "translateY(-4px)" },
+              }}
+            >
+              <CardContent
+                sx={{ display: "flex", alignItems: "center", gap: 3, p: 3 }}
+              >
+                <Box
+                  sx={{
+                    display: "flex",
+                    height: 56,
+                    width: 56,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    borderRadius: 3,
+                    bgcolor: "secondary.light",
+                    color: "secondary.dark",
+                  }}
+                >
+                  <UserCircle size={24} />
+                </Box>
+                <Box>
+                  <DsTypography
+                    element="p"
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ fontWeight: "bold", letterSpacing: 1 }}
+                  >
+                    Gender
+                  </DsTypography>
+                  <DsTypography
+                    element="p"
+                    variant="body1"
+                    color="text.primary"
+                    sx={{
+                      fontWeight: "bold",
+                      mt: 0.5,
+                      textTransform: "capitalize",
+                    }}
+                  >
+                    {user.gender}
+                  </DsTypography>
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
 
-          {/* توکن - طراحی ترمینال */}
-          <div className="md:col-span-2 overflow-hidden rounded-3xl border border-slate-800 bg-slate-900 shadow-xl">
-            <div className="flex items-center gap-2 border-b border-slate-800 bg-slate-950 px-6 py-3">
-              <Terminal size={16} className="text-slate-500" />
-              <span className="text-xs font-mono text-slate-500">
-                auth_token.sh
-              </span>
-            </div>
-            <div className="p-6">
-              <p className="mb-2 text-xs font-bold uppercase tracking-wider text-green-400/70">
-                Session Token (Encrypted)
-              </p>
-              <div className="flex items-center gap-2 font-mono text-sm text-green-400 sm:text-base">
-                <span className="select-none text-slate-600">$</span>
-                <span className="truncate">
-                  {user.accessToken?.substring(0, 40)}...
-                </span>
-                <span className="h-4 w-2 animate-pulse bg-green-400"></span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+          <Grid size={{ xs: 12 }}>
+            <Card
+              sx={{
+                borderRadius: 4,
+                border: "1px solid",
+                borderColor: "divider",
+                bgcolor: "#0f172a",
+                color: "white",
+                boxShadow: 4,
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                  borderBottom: "1px solid #1e293b",
+                  bgcolor: "#020617",
+                  px: 3,
+                  py: 1.5,
+                }}
+              >
+                <Terminal size={16} className="text-slate-500" />
+                <DsTypography
+                  element="span"
+                  variant="caption"
+                  sx={{ fontFamily: "monospace", color: "#64748b" }}
+                >
+                  auth_token.sh
+                </DsTypography>
+              </Box>
+              <CardContent sx={{ p: 3 }}>
+                <DsTypography
+                  element="p"
+                  variant="caption"
+                  sx={{
+                    fontWeight: "bold",
+                    textTransform: "uppercase",
+                    letterSpacing: 1,
+                    color: "#4ade80",
+                    mb: 1,
+                    opacity: 0.8,
+                  }}
+                >
+                  Session Token (Encrypted)
+                </DsTypography>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                    fontFamily: "monospace",
+                    color: "#4ade80",
+                  }}
+                >
+                  <span className="text-slate-600">$</span>
+                  <span className="truncate">
+                    {user.accessToken?.substring(0, 40)}...
+                  </span>
+                  <Box
+                    sx={{
+                      height: 16,
+                      width: 8,
+                      bgcolor: "#4ade80",
+                      animation: "pulse 1s infinite",
+                    }}
+                  />
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
+      </Box>
+    </Box>
   );
 }
 

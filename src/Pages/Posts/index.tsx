@@ -5,55 +5,115 @@ import DsButton from "../../design-system/DsButton";
 import PageHeader from "../../global/PageHeader";
 import { getPostsApi } from "../../Services/Post-services";
 import PostCard from "./Components/PostCard";
+import DsTypography from "../../design-system/DsTypography";
+
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
+import IconButton from "@mui/material/IconButton";
+import CircularProgress from "@mui/material/CircularProgress";
 
 function Posts() {
   const navigate = useNavigate();
+
   const { data, isLoading, refetch, isFetching } = useQuery({
     queryKey: ["posts-list"],
     queryFn: () => getPostsApi(),
   });
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6 transition-colors duration-300 dark:bg-slate-900">
-      <PageHeader text="Posts" />
-      <div className="mx-auto mb-8 flex max-w-7xl items-center justify-between">
-        <div className="flex items-center gap-4">
-          <p className="hidden text-slate-500 dark:text-slate-400 sm:block">
+    <Box
+      sx={{
+        minHeight: "100vh",
+        bgcolor: "#0f172a",
+        p: { xs: 3, md: 6 },
+        transition: "background-color 0.3s",
+      }}
+    >
+      <PageHeader text="Posts Page" />
+
+      <Box
+        sx={{
+          mx: "auto",
+          mb: 4,
+          mt: 2,
+          display: "flex",
+          maxWidth: "xl",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <DsTypography
+            element="p"
+            variant="body1"
+            sx={{ color: "#94a3b8", display: { xs: "none", sm: "block" } }}
+          >
             Share your thoughts and ideas with the community.
-          </p>
-          <button
+          </DsTypography>
+
+          <IconButton
             onClick={() => refetch()}
             disabled={isFetching}
-            className="group flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 shadow-sm transition-all hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-70 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:border-blue-900/50 dark:hover:text-blue-400"
-            title="Refresh Posts"
+            sx={{
+              border: "1px solid #334155",
+              bgcolor: "transparent",
+              color: "#94a3b8",
+              width: 40,
+              height: 40,
+              borderRadius: 3,
+              "&:hover": {
+                bgcolor: "rgba(59, 130, 246, 0.1)",
+                borderColor: "#3b82f6",
+                color: "#3b82f6",
+              },
+            }}
           >
             <RefreshCw
               size={18}
-              className={`transition-all duration-500 ${isFetching ? "animate-spin text-blue-500" : "group-hover:rotate-180"}`}
+              className={isFetching ? "animate-spin text-blue-500" : ""}
             />
-          </button>
-        </div>
+          </IconButton>
+        </Box>
+
         <DsButton
           text="Create Post"
           icon={<Plus size={18} />}
           color="blue"
-          className="rounded-xl px-5 py-2.5 font-bold shadow-lg shadow-blue-500/20"
+          sx={{
+            borderRadius: 2,
+            px: 3,
+            py: 1,
+            fontWeight: "bold",
+            bgcolor: "#3b82f6",
+            textTransform: "none",
+            boxShadow: "none",
+          }}
           onClick={() => navigate("/app/posts/create-post")}
         />
-      </div>
+      </Box>
 
       {isLoading ? (
-        <div className="mt-8 flex justify-center text-slate-500">
-          Loading posts...
-        </div>
+        <Box
+          sx={{
+            mt: 8,
+            display: "flex",
+            justifyContent: "center",
+            color: "#94a3b8",
+          }}
+        >
+          <CircularProgress color="inherit" />
+        </Box>
       ) : (
-        <div className="mx-auto mt-8 grid max-w-7xl grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        <Grid container spacing={3} sx={{ maxWidth: "xl", mx: "auto" }}>
           {data?.posts.map((post, index) => (
-            <PostCard key={post.id} post={post} index={index} />
+            <Grid size={{ xs: 12, md: 6, xl: 4 }} key={post.id}>
+              <PostCard post={post} index={index} />
+            </Grid>
           ))}
-        </div>
+        </Grid>
       )}
-    </div>
+    </Box>
   );
 }
+
 export default Posts;

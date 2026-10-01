@@ -2,12 +2,17 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { Loader2, Send, AlertCircle } from "lucide-react";
+import { Loader2, Send } from "lucide-react";
 import { createPostsApi } from "../../../Services/Post-services";
 import { useAuthStore } from "../../../Stores/Auth.store";
 import type { CreatePostForm } from "../../../Types/CreatePostForm";
 import SharedBackButton from "../../../global/SharedBackButton";
-import PageHeader from "../../../global/PageHeader";
+import DsTypography from "../../../design-system/DsTypography";
+
+import Box from "@mui/material/Box";
+import Card from "@mui/material/Card";
+import OutlinedInput from "@mui/material/OutlinedInput";
+import Button from "@mui/material/Button";
 
 function CreatePost() {
   const { user } = useAuthStore();
@@ -19,11 +24,7 @@ function CreatePost() {
     register,
     formState: { errors },
   } = useForm<CreatePostForm>({
-    defaultValues: {
-      title: "",
-      body: "",
-      userId: user?.id || 1,
-    },
+    defaultValues: { title: "", body: "", userId: user?.id || 1 },
   });
 
   const { mutate, isPending } = useMutation({
@@ -33,111 +34,146 @@ function CreatePost() {
       toast.success("Post has been created successfully.");
       navigate("/app/posts");
     },
-    onError: (error: Error) => {
-      toast.error(error.message || "Failed to create post.");
-    },
+    onError: (error: Error) =>
+      toast.error(error.message || "Failed to create post."),
   });
 
   const onCreatePost = (formData: CreatePostForm) => {
-    if (!formData.title.trim() || !formData.body.trim()) {
-      toast.error("Please fill in all fields.");
-      return;
-    }
-    mutate({
-      title: formData.title,
-      body: formData.body,
-      userId: formData.userId,
-    });
+    if (!formData.title.trim() || !formData.body.trim())
+      return toast.error("Please fill in all fields.");
+    mutate(formData);
+  };
+
+  const inputStyles = {
+    bgcolor: "#0f172a", // رنگ بسیار تاریک داخل فیلدها
+    borderRadius: "12px",
+    color: "#f8fafc",
+    "& fieldset": { borderColor: "#334155" },
+    "&:hover fieldset": { borderColor: "#475569" },
+    "&.Mui-focused fieldset": { borderColor: "#3b82f6", borderWidth: "1px" },
+    "& .MuiInputBase-input::placeholder": { color: "#64748b", opacity: 1 },
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 px-4 py-8 transition-colors duration-300 dark:bg-slate-900 sm:px-6 lg:px-8">
+    <Box sx={{ minHeight: "100vh", bgcolor: "#0f172a", p: { xs: 3, md: 6 } }}>
       <SharedBackButton to="/app/posts" text="Back to Posts" />
 
-      <div className="mx-auto max-w-3xl overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-800">
-        <div className="border-b border-gray-100 bg-slate-50/50 px-8 py-6 dark:border-slate-700/50 dark:bg-slate-800/50">
-          <PageHeader text="Create a New Post" />
-          <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+      <Card
+        sx={{
+          mx: "auto",
+          mt: 4,
+          maxWidth: 800,
+          borderRadius: "20px",
+          bgcolor: "#1e293b",
+          boxShadow: "none",
+          border: "1px solid #334155",
+        }}
+      >
+        <Box sx={{ p: { xs: 4, md: 5 }, borderBottom: "1px solid #334155" }}>
+          <DsTypography
+            element="h1"
+            variant="h4"
+            sx={{ fontWeight: 800, color: "#f8fafc", mb: 1 }}
+          >
+            Create a New Post Page
+          </DsTypography>
+          <DsTypography element="p" variant="body1" sx={{ color: "#94a3b8" }}>
             Write something awesome to share with the platform.
-          </p>
-        </div>
+          </DsTypography>
+        </Box>
 
-        <div className="p-8 sm:p-12">
-          <form className="space-y-6" onSubmit={handleSubmit(onCreatePost)}>
-            <div className="space-y-2">
-              <label
-                htmlFor="title"
-                className="flex items-center justify-between text-sm font-bold text-slate-700 dark:text-slate-300"
-              >
-                <span>Post Title</span>
-                {errors.title && (
-                  <span className="flex animate-pulse items-center gap-1 rounded-md bg-red-100 px-2 py-1 text-[11px] font-extrabold uppercase tracking-wide text-red-600 dark:bg-red-500/20 dark:text-red-400">
-                    <AlertCircle size={14} /> {errors.title.message}
-                  </span>
-                )}
-              </label>
-              <input
-                id="title"
-                type="text"
-                placeholder="E.g., The Future of React 19..."
-                className={`w-full rounded-xl border bg-slate-50 px-4 py-3 text-slate-900 transition-all focus:bg-white focus:outline-none focus:ring-4 dark:bg-slate-900/50 dark:text-white dark:focus:bg-slate-900 ${
-                  errors.title
-                    ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/10"
-                    : "border-slate-200 focus:border-blue-500 focus:ring-blue-500/10 dark:border-slate-700 dark:focus:border-blue-500"
-                }`}
-                {...register("title", { required: "Title is required" })}
-              />
-            </div>
+        <Box
+          component="form"
+          onSubmit={handleSubmit(onCreatePost)}
+          sx={{
+            p: { xs: 4, md: 5 },
+            display: "flex",
+            flexDirection: "column",
+            gap: 4,
+          }}
+        >
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+            <DsTypography
+              element="label"
+              variant="body2"
+              sx={{ fontWeight: "bold", color: "#f8fafc" }}
+            >
+              Post Title{" "}
+              {errors.title && (
+                <span style={{ color: "#ef4444", fontSize: "12px" }}>
+                  {" "}
+                  - {errors.title.message}
+                </span>
+              )}
+            </DsTypography>
+            <OutlinedInput
+              fullWidth
+              placeholder="E.g., The Future of React 19..."
+              {...register("title", { required: "Title is required" })}
+              error={!!errors.title}
+              sx={inputStyles}
+            />
+          </Box>
 
-            <div className="space-y-2">
-              <label
-                htmlFor="body"
-                className="flex items-center justify-between text-sm font-bold text-slate-700 dark:text-slate-300"
-              >
-                <span>Content</span>
-                {errors.body && (
-                  <span className="flex animate-pulse items-center gap-1 rounded-md bg-red-100 px-2 py-1 text-[11px] font-extrabold uppercase tracking-wide text-red-600 dark:bg-red-500/20 dark:text-red-400">
-                    <AlertCircle size={14} /> {errors.body.message}
-                  </span>
-                )}
-              </label>
-              <textarea
-                id="body"
-                rows={8}
-                placeholder="What's on your mind?..."
-                className={`w-full resize-none rounded-xl border bg-slate-50 px-4 py-3 text-slate-900 transition-all focus:bg-white focus:outline-none focus:ring-4 dark:bg-slate-900/50 dark:text-white dark:focus:bg-slate-900 ${
-                  errors.body
-                    ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/10"
-                    : "border-slate-200 focus:border-blue-500 focus:ring-blue-500/10 dark:border-slate-700 dark:focus:border-blue-500"
-                }`}
-                {...register("body", {
-                  required: "Post body is required",
-                  minLength: { value: 10, message: "Min 10 characters" },
-                })}
-              ></textarea>
-            </div>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+            <DsTypography
+              element="label"
+              variant="body2"
+              sx={{ fontWeight: "bold", color: "#f8fafc" }}
+            >
+              Content{" "}
+              {errors.body && (
+                <span style={{ color: "#ef4444", fontSize: "12px" }}>
+                  {" "}
+                  - {errors.body.message}
+                </span>
+              )}
+            </DsTypography>
+            <OutlinedInput
+              fullWidth
+              multiline
+              rows={8}
+              placeholder="What's on your mind?..."
+              {...register("body", {
+                required: "Post body is required",
+                minLength: { value: 10, message: "Min 10 chars" },
+              })}
+              error={!!errors.body}
+              sx={inputStyles}
+            />
+          </Box>
 
-            <div className="flex justify-end pt-4">
-              <button
-                type="submit"
-                disabled={isPending}
-                className="group flex items-center gap-2 rounded-xl bg-blue-600 px-8 py-3 font-bold text-white shadow-lg shadow-blue-500/30 transition-all hover:-translate-y-1 hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:translate-y-0"
-              >
-                {isPending ? (
-                  <>
-                    <Loader2 size={16} className="animate-spin" /> Publishing...
-                  </>
+          <Box sx={{ display: "flex", justifyContent: "flex-end", pt: 2 }}>
+            <Button
+              type="submit"
+              disabled={isPending}
+              variant="contained"
+              disableElevation
+              startIcon={
+                isPending ? (
+                  <Loader2 size={18} className="animate-spin" />
                 ) : (
-                  <>
-                    <Send size={16} /> Publish Post
-                  </>
-                )}
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
+                  <Send size={18} />
+                )
+              }
+              sx={{
+                bgcolor: "#3b82f6",
+                color: "white",
+                textTransform: "none",
+                fontWeight: 600,
+                fontSize: "0.95rem",
+                px: 4,
+                py: 1.25,
+                borderRadius: "12px",
+                "&:hover": { bgcolor: "#2563eb" },
+              }}
+            >
+              {isPending ? "Publishing..." : "Publish"}
+            </Button>
+          </Box>
+        </Box>
+      </Card>
+    </Box>
   );
 }
 

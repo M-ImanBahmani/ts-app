@@ -1,24 +1,29 @@
 import PageHeader from "../../global/PageHeader";
-import DsButton from "../../design-system/DsButton"; // مسیر فایل خودتان را تنظیم کنید
+import DsButton from "../../design-system/DsButton";
 import { Save } from "lucide-react";
 import Button from "@mui/material/Button";
+import Box from "@mui/material/Box";
 
 function MuiPage() {
   return (
-    <div className="p-8">
+    <Box sx={{ p: { xs: 2, md: 4 } }}>
       <PageHeader text="MUI Integration" />
 
-      <div className="mt-8 flex gap-4">
+      <Box sx={{ mt: 4, display: "flex", gap: 2, flexWrap: "wrap" }}>
         <DsButton text="Save Data" color="green" icon={<Save size={18} />} />
+
         <DsButton
           text="MUI Outlined Button"
           color="blue"
           variant="outlined"
           disableRipple
         />
-        <Button variant="contained">Hello world</Button>
-      </div>
-    </div>
+
+        <Button variant="contained" color="primary">
+          Hello world
+        </Button>
+      </Box>
+    </Box>
   );
 }
 
